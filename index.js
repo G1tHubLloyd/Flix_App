@@ -29,6 +29,13 @@ app.get('/movies', (req, res) => {
         .catch((err) => res.status(500).send('Error: ' + err));
 });
 
+// Add new movie
+app.post('/movies', (req, res) => {
+  Movies.create(req.body)
+    .then((movie) => res.status(201).json(movie))
+    .catch((err) => res.status(500).send('Error: ' + err));
+});
+
 // Root endpoint
 app.get('/', (req, res) => {
     res.send('Welcome to myFlix API!');
