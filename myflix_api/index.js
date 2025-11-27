@@ -59,6 +59,36 @@ app.post('/users/:id/movies/:movieId', async (req, res) => {
     }
 });
 
+// Alias: accept POST /:userId/movies/:movieId (some clients use this shorter shape)
+app.post('/:userId/movies/:movieId', async (req, res) => {
+    try {
+        const user = await Users.findByIdAndUpdate(
+            req.params.userId,
+            { $push: { FavoriteMovies: req.params.movieId } },
+            { new: true }
+        );
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        res.json(user);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Alias: allow POST /:userId/movies/:movieId -> add favorite
+app.post('/:userId/movies/:movieId', async (req, res) => {
+    try {
+        const user = await Users.findByIdAndUpdate(
+            req.params.userId,
+            { $push: { FavoriteMovies: req.params.movieId } },
+            { new: true }
+        );
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        res.json(user);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // ✅ Movie routes
 // Get all movies
 app.get('/movies', async (req, res) => {
