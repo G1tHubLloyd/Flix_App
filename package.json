@@ -1,0 +1,11 @@
+{
+  "name": "myflix-monorepo-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node myflix_api/index.js",
+    "start:api": "node myflix_api/index.js",
+    "start:client": "cd myflix_client && npm start",
+    "heroku-postbuild": "cd myflix_api && npm install"
+  }
+}
