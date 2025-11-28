@@ -89,6 +89,29 @@ export default function App() {
         }
     }
 
+    async function handleDeleteUser(userId) {
+        try {
+            await axios.delete(`${API_BASE}/users/${userId}`)
+            const res = await axios.get(`${API_BASE}/users`)
+            setUsers(res.data)
+            if (selectedUser && selectedUser._id === userId) setSelectedUser(null)
+        } catch (err) {
+            console.error('Failed to delete user', err)
+        }
+    }
+
+    async function handleUpdateUser(userId, data) {
+        try {
+            const res = await axios.put(`${API_BASE}/users/${userId}`, data)
+            const updated = res.data
+            setUsers((prev) => prev.map(u => (u._id === updated._id ? updated : u)))
+            if (selectedUser && selectedUser._id === updated._id) setSelectedUser(updated)
+        } catch (err) {
+            console.error('Failed to update user', err)
+            throw err
+        }
+    }
+
     return (
         <div className="app">
             <header>
@@ -107,7 +130,7 @@ export default function App() {
 
                 <aside style={{ width: 360 }}>
                     <h2>Users</h2>
-                    <UsersList users={users} selectedUser={selectedUser} onSelect={setSelectedUser} />
+                    <UsersList users={users} selectedUser={selectedUser} onSelect={setSelectedUser} onDeleteUser={handleDeleteUser} onUpdateUser={handleUpdateUser} />
                     <AddUserForm onUserAdded={handleUserAdded} />
                     <hr />
                     <h3>Add Movie</h3>
