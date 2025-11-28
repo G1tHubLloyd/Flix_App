@@ -69,6 +69,26 @@ export default function App() {
         }
     }
 
+    async function handleDeleteMovie(movieId) {
+        try {
+            await axios.delete(`${API_BASE}/movies/${movieId}`)
+            // refresh movies and users so UI reflects deleted movie and favorites
+            const [moviesRes, usersRes] = await Promise.all([
+                axios.get(`${API_BASE}/movies`),
+                axios.get(`${API_BASE}/users`),
+            ])
+            setMovies(moviesRes.data)
+            setUsers(usersRes.data)
+            // if selected user had that movie, ensure selection updates
+            if (selectedUser) {
+                const updated = usersRes.data.find(u => u._id === selectedUser._id)
+                setSelectedUser(updated || null)
+            }
+        } catch (err) {
+            console.error('Failed to delete movie', err)
+        }
+    }
+
     return (
         <div className="app">
             <header>
@@ -81,7 +101,7 @@ export default function App() {
                     {loading && <div>Loading movies…</div>}
                     {error && <div className="error">Error: {error}</div>}
                     {!loading && !error && (
-                        <MoviesList movies={movies} selectedUser={selectedUser} onAddFavorite={handleAddFavorite} />
+                        <MoviesList movies={movies} selectedUser={selectedUser} onAddFavorite={handleAddFavorite} onDelete={handleDeleteMovie} />
                     )}
                 </div>
 

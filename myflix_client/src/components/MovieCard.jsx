@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 
-export default function MovieCard({ movie, selectedUser, onAddFavorite }) {
+export default function MovieCard({ movie, selectedUser, onAddFavorite, onDelete }) {
     const [status, setStatus] = useState(null)
 
     async function handleAddFavorite() {
@@ -24,6 +24,16 @@ export default function MovieCard({ movie, selectedUser, onAddFavorite }) {
             <p>{movie.Description}</p>
             <div style={{ marginTop: 8 }}>
                 <button onClick={handleAddFavorite}>Add to Favorites</button>
+                <button
+                    style={{ marginLeft: 8 }}
+                    onClick={async () => {
+                        if (!onDelete) return
+                        if (!window.confirm('Delete this movie?')) return
+                        await onDelete(movie._id || movie.id)
+                    }}
+                >
+                    Delete
+                </button>
                 {status && <span style={{ marginLeft: 8 }}>{status}</span>}
             </div>
         </div>
@@ -39,5 +49,6 @@ MovieCard.propTypes = {
     }).isRequired,
     selectedUser: PropTypes.object,
     onAddFavorite: PropTypes.func,
+    onDelete: PropTypes.func,
 }
 
