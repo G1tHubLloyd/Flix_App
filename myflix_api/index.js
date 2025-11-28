@@ -138,6 +138,25 @@ app.get('/movies/:id', async (req, res) => {
     }
 });
 
+// Delete a movie by ID and remove references from users' favorites
+app.delete('/movies/:id', async (req, res) => {
+    try {
+        const movieId = req.params.id;
+        const movie = await Movies.findByIdAndDelete(movieId);
+        if (!movie) return res.status(404).json({ error: 'Movie not found' });
+
+        // remove this movie from any user's FavoriteMovies
+        await Users.updateMany(
+            { FavoriteMovies: movieId },
+            { $pull: { FavoriteMovies: movieId } }
+        );
+
+        res.json({ message: 'Movie deleted', movie });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Root endpoint
 app.get('/', (req, res) => {
     res.send('Welcome to myFlix API!');
