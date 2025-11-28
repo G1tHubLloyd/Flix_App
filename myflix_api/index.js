@@ -37,7 +37,7 @@ app.post('/users', async (req, res) => {
 // ✅ Get all users (without passwords)
 app.get('/users', async (req, res) => {
     try {
-        const users = await Users.find().select('-Password');
+        const users = await Users.find().select('-Password').populate('FavoriteMovies');
         res.json(users);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -60,22 +60,7 @@ app.put('/users/:id', async (req, res) => {
     }
 });
 
-// Update a user (simple update, excludes returning Password)
-app.put('/users/:id', async (req, res) => {
-    try {
-        const updates = req.body;
-        const user = await Users.findByIdAndUpdate(
-            req.params.id,
-            updates,
-            { new: true, runValidators: true }
-        ).select('-Password');
-
-        if (!user) return res.status(404).json({ error: 'User not found' });
-        res.json(user);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
+// (Note: single update handler is defined above; duplicate removed)
 
 // Delete a user by ID
 app.delete('/users/:id', async (req, res) => {
@@ -113,22 +98,7 @@ app.post('/:userId/movies/:movieId', async (req, res) => {
             req.params.userId,
             { $push: { FavoriteMovies: req.params.movieId } },
             { new: true }
-        );
-        if (!user) return res.status(404).json({ error: 'User not found' });
-        res.json(user);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Alias: allow POST /:userId/movies/:movieId -> add favorite
-app.post('/:userId/movies/:movieId', async (req, res) => {
-    try {
-        const user = await Users.findByIdAndUpdate(
-            req.params.userId,
-            { $push: { FavoriteMovies: req.params.movieId } },
-            { new: true }
-        );
+        ).populate('FavoriteMovies');
         if (!user) return res.status(404).json({ error: 'User not found' });
         res.json(user);
     } catch (err) {
