@@ -60,6 +60,37 @@ app.put('/users/:id', async (req, res) => {
     }
 });
 
+// Update a user (simple update, excludes returning Password)
+app.put('/users/:id', async (req, res) => {
+    try {
+        const updates = req.body;
+        const user = await Users.findByIdAndUpdate(
+            req.params.id,
+            updates,
+            { new: true, runValidators: true }
+        ).select('-Password');
+
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        res.json(user);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Delete a user by ID
+app.delete('/users/:id', async (req, res) => {
+    try {
+        const user = await Users.findByIdAndDelete(req.params.id);
+        if (!user) return res.status(404).json({ error: 'User not found' });
+        const resp = user.toObject ? user.toObject() : user;
+        if (resp.Password) delete resp.Password;
+        res.json({ message: 'User deleted', user: resp });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
 // Add a Movie to a User’s Favorites
 app.post('/users/:id/movies/:movieId', async (req, res) => {
     try {
@@ -132,36 +163,6 @@ app.get('/movies/:id', async (req, res) => {
         const movie = await Movies.findById(req.params.id);
         if (!movie) return res.status(404).json({ error: 'Movie not found' });
         res.json(movie);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Update a user (simple update, excludes returning Password)
-app.put('/users/:id', async (req, res) => {
-    try {
-        const updates = req.body;
-        const user = await Users.findByIdAndUpdate(
-            req.params.id,
-            updates,
-            { new: true, runValidators: true }
-        ).select('-Password');
-
-        if (!user) return res.status(404).json({ error: 'User not found' });
-        res.json(user);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Delete a user by ID
-app.delete('/users/:id', async (req, res) => {
-    try {
-        const user = await Users.findByIdAndDelete(req.params.id);
-        if (!user) return res.status(404).json({ error: 'User not found' });
-        const resp = user.toObject ? user.toObject() : user;
-        if (resp.Password) delete resp.Password;
-        res.json({ message: 'User deleted', user: resp });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

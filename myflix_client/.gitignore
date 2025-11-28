@@ -1,1 +1,6 @@
-myflix_client/node_modules/
+node_modules/
+dist/
+/.env
+/.vite
+npm-debug.log
+yarn-error.log
