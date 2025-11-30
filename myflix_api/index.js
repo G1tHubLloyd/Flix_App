@@ -138,6 +138,29 @@ app.get('/movies/:id', async (req, res) => {
     }
 });
 
+// Update a movie (replace or partial)
+app.put('/movies/:id', async (req, res) => {
+    try {
+        const updates = req.body;
+        const movie = await Movies.findByIdAndUpdate(req.params.id, updates, { new: true, runValidators: true });
+        if (!movie) return res.status(404).json({ error: 'Movie not found' });
+        res.json(movie);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.patch('/movies/:id', async (req, res) => {
+    try {
+        const updates = req.body;
+        const movie = await Movies.findByIdAndUpdate(req.params.id, { $set: updates }, { new: true, runValidators: true });
+        if (!movie) return res.status(404).json({ error: 'Movie not found' });
+        res.json(movie);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Delete a movie by ID and remove references from users' favorites
 app.delete('/movies/:id', async (req, res) => {
     try {
