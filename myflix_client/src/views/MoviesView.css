@@ -113,3 +113,28 @@
     font-size: 13px;
     margin: 5px 0;
 }
+
+.favorite-btn {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    background-color: #333;
+    color: #fff;
+    border: 2px solid #e50914;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.favorite-btn:hover {
+    background-color: #e50914;
+    color: white;
+}
+
+.favorite-btn.active {
+    background-color: #e50914;
+    color: white;
+    border-color: #b20710;
+}

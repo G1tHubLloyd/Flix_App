@@ -63,6 +63,17 @@ router.post('/:username/movies/:movieId', passport.authenticate('jwt', { session
         .catch(err => res.status(500).send('Error: ' + err));
 });
 
+// Remove a movie from user's favorites
+router.delete('/:username/movies/:movieId', passport.authenticate('jwt', { session: false }), (req, res) => {
+    User.findOneAndUpdate(
+        { username: req.params.username },
+        { $pull: { favoriteMovies: req.params.movieId } },
+        { new: true }
+    )
+        .then(updatedUser => res.json(updatedUser))
+        .catch(err => res.status(500).send('Error: ' + err));
+});
+
 router.get('/public', (req, res) => {
     User.find()
         .then(users => res.json(users))

@@ -7,7 +7,8 @@ const MoviesView = () => {
     const [movies, setMovies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { logout } = useAuth();
+    const [favorites, setFavorites] = useState([]);
+    const { logout, user } = useAuth();
 
     useEffect(() => {
         fetchMovies();
@@ -27,6 +28,36 @@ const MoviesView = () => {
         }
     };
 
+    const handleAddFavorite = async (movieId) => {
+        try {
+            if (!user || !user.username) {
+                setError('User not authenticated');
+                return;
+            }
+
+            await movieService.addFavorite(user.username, movieId);
+            setFavorites([...favorites, movieId]);
+        } catch (err) {
+            console.error('Error adding favorite:', err);
+            setError('Failed to add favorite. Please try again.');
+        }
+    };
+
+    const handleRemoveFavorite = async (movieId) => {
+        try {
+            if (!user || !user.username) {
+                setError('User not authenticated');
+                return;
+            }
+
+            await movieService.removeFavorite(user.username, movieId);
+            setFavorites(favorites.filter(id => id !== movieId));
+        } catch (err) {
+            console.error('Error removing favorite:', err);
+            setError('Failed to remove favorite. Please try again.');
+        }
+    };
+
     const handleLogout = () => {
         logout();
     };
@@ -39,25 +70,16 @@ const MoviesView = () => {
         );
     }
 
-    if (error) {
-        return (
-            <div className="movies-view">
-                <div className="error-message">{error}</div>
-                <button onClick={fetchMovies} className="retry-btn">
-                    Retry
-                </button>
-            </div>
-        );
-    }
-
     return (
         <div className="movies-view">
             <header className="movies-header">
-                <h1>MyFlix Movies</h1>
+                <h1>MyFlix - Movie Catalog</h1>
                 <button onClick={handleLogout} className="logout-btn">
                     Logout
                 </button>
             </header>
+
+            {error && <div className="error-message">{error}</div>}
 
             <div className="movies-grid">
                 {movies.length === 0 ? (
@@ -81,6 +103,18 @@ const MoviesView = () => {
                                 {movie.Genre && (
                                     <p className="movie-genre">Genre: {movie.Genre.Name}</p>
                                 )}
+                                <button
+                                    className={`favorite-btn ${favorites.includes(movie._id) ? 'active' : ''}`}
+                                    onClick={() => {
+                                        if (favorites.includes(movie._id)) {
+                                            handleRemoveFavorite(movie._id);
+                                        } else {
+                                            handleAddFavorite(movie._id);
+                                        }
+                                    }}
+                                >
+                                    {favorites.includes(movie._id) ? '❤️ Favorited' : '🤍 Add to Favorites'}
+                                </button>
                             </div>
                         </div>
                     ))

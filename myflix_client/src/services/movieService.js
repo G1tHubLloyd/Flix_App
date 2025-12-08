@@ -20,6 +20,32 @@ class MovieService {
             throw error;
         }
     }
+
+    async addFavorite(username, movieId) {
+        try {
+            const response = await apiService.post(
+                `/users/${username}/movies/${movieId}`,
+                {},
+                { method: 'POST' }
+            );
+            return response;
+        } catch (error) {
+            console.error('Error adding favorite:', error);
+            throw error;
+        }
+    }
+
+    async removeFavorite(username, movieId) {
+        try {
+            const response = await apiService.delete(
+                `/users/${username}/movies/${movieId}`
+            );
+            return response;
+        } catch (error) {
+            console.error('Error removing favorite:', error);
+            throw error;
+        }
+    }
 }
 
 export const movieService = new MovieService();
