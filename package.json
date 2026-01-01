@@ -1,0 +1,10 @@
+{
+    "name": "myflix-app",
+    "private": true,
+    "scripts": {
+        "dev": "concurrently \"npm --prefix my-api run dev\" \"npm --prefix my-client run dev\""
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    }
+}
